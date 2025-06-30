@@ -1,0 +1,23 @@
+DESCRIPTION >
+Returns Payment Rates
+
+TOKEN "dashboard" READ
+
+NODE endpoint
+SQL >
+%
+SELECT
+      count() AS total,
+    countIf(payment_status = 'SETTLED') AS settled,
+    countIf(payment_status = 'DECLINED') AS declined,
+    countIf(payment_status = 'FAILED') AS failed,
+
+
+    IF(total = 0, 0.0, round((settled / total) * 100, 2)) AS settled_percent,
+    IF(total = 0, 0.0, round((declined / total) * 100, 2)) AS declined_percent,
+    IF(total = 0, 0.0, round((failed / total) * 100, 2)) AS failed_percent
+
+FROM payments
+WHERE organization_id = {{ String(org_id, description="Organization ID", required=True) }}
+
+TYPE endpoint

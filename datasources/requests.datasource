@@ -1,0 +1,39 @@
+DESCRIPTION >
+    Tracks requests to the service
+
+TOKEN "tracker" APPEND
+
+SCHEMA >
+    `id` String `json:$.id`,
+    `status` String `json:$.status`,
+    `timestamp` DateTime64(3) `json:$.timestamp`,
+    `direction` String `json:$.direction`,
+    `event_type` String `json:$.event_type`,
+    `url` String `json:$.url`,
+    `request_method` String `json:$.request_method`,
+    `request_headers` Nullable(String) `json:$.request_headers`,
+    `request_body` Nullable(String) `json:$.request_body`,
+    `response_headers` Nullable(String) `json:$.response_headers`,
+    `response_body` Nullable(String) `json:$.response_body`,
+    `response_status` Nullable(Int32) `json:$.response_status`,
+    `response_status_description` Nullable(String) `json:$.response_status_description`,
+    `source` String `json:$.source`,
+    `target` String `json:$.target`,
+    `processor` String `json:$.processor`,
+    `title` String `json:$.title`,
+    `error_message` Nullable(String) `json:$.error_message`,
+    `organization_id` Nullable(String) `json:$.organization_id`,
+    `payment_id` Nullable(String) `json:$.payment_id`,
+    `payment_operation` Nullable(String) `json:$.payment_operation`,
+    `client_session` Nullable(String) `json:$.client_session`,
+    `trigger_date` Nullable(DateTime64(3)) `json:$.trigger_date`
+
+ENGINE MergeTree
+ENGINE_PARTITION_KEY toYYYYMM(timestamp)
+ENGINE_SORTING_KEY timestamp
+
+FORWARD_QUERY >
+  SELECT id, status, CAST(timestamp, 'DateTime64(3)') AS timestamp, direction, event_type, url, request_method, request_headers, request_body, response_headers, response_body, response_status, response_status_description, source, target, processor, title, error_message, organization_id, payment_id, payment_operation, CAST(trigger_date, 'Nullable(DateTime64(3))') AS trigger_date
+
+FORWARD_QUERY >
+  SELECT id, status, timestamp, direction, event_type, url, request_method, request_headers, request_body, response_headers, response_body, response_status, response_status_description, source, target, processor, title, error_message, organization_id, payment_id, payment_operation, defaultValueOfTypeName('Nullable(String)') AS client_session, trigger_date

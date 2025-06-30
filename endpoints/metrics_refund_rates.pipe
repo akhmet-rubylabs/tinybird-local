@@ -1,0 +1,28 @@
+DESCRIPTION >
+    Returns the refund rate (percentage of settled and refunded payments out of all payments) for a given organization.
+
+TOKEN "dashboard" READ
+
+NODE endpoint
+SQL >
+    %
+    WITH
+        (
+            SELECT COUNT(*)
+            FROM payments
+            WHERE organization_id = {{ String(org_id, description="Organization ID", required=True) }}
+        ) AS total,
+
+        (
+            SELECT COUNT(*)
+            FROM payments
+            WHERE
+                organization_id = {{ org_id }}
+                AND payment_status = 'SETTLED'
+                AND refunded_amount > 0
+        ) AS refunded
+
+    SELECT
+        IF(total = 0, 0.0, (refunded / total) * 100) AS refund_rate
+
+TYPE endpoint

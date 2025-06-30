@@ -1,0 +1,58 @@
+DESCRIPTION >
+    Retrieves request data joined with payment status, filtered by organization ID
+
+TOKEN "dashboard" READ
+
+NODE endpoint
+SQL >
+    %
+    SELECT
+        r.id,
+        toDateTime(r.timestamp) as timestamp,
+        toDateTime(r.trigger_date) as trigger_date,
+        r.direction,
+        r.event_type,
+        r.url,
+        r.request_method,
+        r.request_headers,
+        r.request_body,
+        r.response_headers,
+        r.response_body,
+        r.response_status,
+        r.response_status_description,
+        r.source,
+        r.target,
+        r.processor,
+        r.title,
+        r.error_message,
+        r.organization_id,
+        r.payment_id,
+        r.client_session,
+        COALESCE(NULLIF(r.status, ''), p.payment_status, 'DECLINED') AS status
+    FROM requests r
+    LEFT JOIN payments p ON r.payment_id = p.payment_id and p.payment_operation = r.payment_operation
+    WHERE
+        r.organization_id = {{ String(organization_id, description="Organization ID to filter requests", required=True) }}
+        {% if defined(payment_id) %}
+            AND r.payment_id = {{ String(payment_id, description="Payment ID to filter requests", required=False) }}
+        {% end %}
+        {% if defined(date_from) %}
+            AND r.timestamp
+            >=
+            {{ DateTime(date_from, description="Starting date for filtering a date range", required=False) }}
+        {% end %}
+        {% if defined(date_to) %}
+            AND r.timestamp
+            <=
+            {{ DateTime(date_to, description="Ending date for filtering a date range", required=False) }}
+        {% end %}
+        {% if defined(direction) %}
+            AND r.direction = {{ String(direction, description="Filter by request direction (inbound/outbound)", required=False) }}
+        {% end %}
+        {% if defined(payment_status) %}
+            AND p.payment_status = {{ String(payment_status, description="Filter by payment status", required=False) }}
+        {% end %}
+    ORDER BY r.trigger_date DESC
+    LIMIT {{ Int32(limit, 100, description="Maximum number of records to return") }}
+
+TYPE endpoint

@@ -1,0 +1,37 @@
+DESCRIPTION >
+    Tracks payment transactions and their associated metadata
+
+TOKEN "tracker" APPEND
+
+SCHEMA >
+    `id` String `json:$.id`,
+    `created_at` DateTime `json:$.created_at`,
+    `updated_at` Nullable(DateTime) `json:$.updated_at`,
+    `currency_code` Nullable(String) `json:$.currency_code`,
+    `amount` Int32 `json:$.amount`,
+    `amount_usd` Nullable(Int32) `json:$.amount_usd`,
+    `refunded_amount` Nullable(Int32) `json:$.refunded_amount`,
+    `payment_type` Nullable(String) `json:$.payment_type`,
+    `payment_status` Nullable(String) `json:$.payment_status`,
+    `metadata` Nullable(String) `json:$.metadata`,
+    `attributes` Nullable(String) `json:$.attributes`,
+    `processor_type` Nullable(String) `json:$.processor_type`,
+    `card_token_type_used` Nullable(String) `json:$.card_token_type_used`,
+    `payment_method_id` Nullable(String) `json:$.payment_method_id`,
+    `organization_id` Nullable(String) `json:$.organization_id`,
+    `subscription_id` Nullable(String) `json:$.subscription_id`,
+    `processor_id` Nullable(String) `json:$.processor_id`,
+    `dispute_id` Nullable(String) `json:$.dispute_id`,
+    `customer_id` Nullable(String) `json:$.customer_id`,
+    `timestamp` DateTime `json:$.timestamp`,
+    `error_message` Nullable(String) `json:$.error_message`,
+    `payment_id` Nullable(String) `json:$.payment_id`,
+    `payment_operation` Nullable(String) `json:$.payment_operation`
+
+ENGINE MergeTree
+ENGINE_PARTITION_KEY toYYYYMM(timestamp)
+ENGINE_SORTING_KEY created_at
+ENGINE_TTL timestamp + toIntervalDay(60)
+
+FORWARD_QUERY >
+  SELECT id, created_at, updated_at, currency_code, amount, amount_usd, refunded_amount, payment_type, payment_status, metadata, attributes, processor_type, card_token_type_used, payment_method_id, organization_id, subscription_id, processor_id, dispute_id, customer_id, timestamp, error_message, defaultValueOfTypeName('Nullable(String)') AS payment_id, defaultValueOfTypeName('Nullable(String)') AS payment_operation

@@ -1,0 +1,20 @@
+DESCRIPTION >
+  Store webhooks information for analytics
+
+SCHEMA >
+  `webhook_id`      UUID                `json:$.webhook_id`,
+  `event_type`      String              `json:$.event_type`,
+  `event_trigger`   String              `json:$.event_trigger`,
+  `status_code`     Nullable(Int32)     `json:$.status_code`,
+  `name`            String              `json:$.name`,
+  `status`          String              `json:$.status`,
+  `organization_id` String              `json:$.organization_id`,
+  `url`             String              `json:$.url`,
+  `bearer_token`    String              `json:$.bearer_token`,
+  `payload`         String               `json:$.payload`,
+  `payment_id`      Nullable(String)    `json:$.payment_id`,
+  `created_at`      DateTime            `json:$.created_at`
+
+ENGINE MergeTree
+ENGINE_PARTITION_KEY toYYYYMM(created_at)
+ENGINE_SORTING_KEY created_at, webhook_id

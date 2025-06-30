@@ -1,0 +1,41 @@
+DESCRIPTION >
+    Retrieves payment records for a specific customer ID
+
+TOKEN "dashboard" READ
+
+NODE endpoint
+SQL >
+    %
+    SELECT
+        id,
+        created_at,
+        updated_at,
+        currency_code,
+        amount,
+        amount_usd,
+        refunded_amount,
+        payment_type,
+        payment_status,
+        processor_type,
+        customer_id
+    FROM payments
+    WHERE
+        customer_id = {{ String(customer_id, description="Customer ID to filter payments", required=True) }}
+        AND organization_id = {{ String(organization_id, description="Organization ID to filter payments", required=True) }}
+        {% if defined(date_from) %}
+            AND created_at
+            >=
+            {{ DateTime(date_from, description="Starting date for filtering a date range", required=False) }}
+        {% end %}
+        {% if defined(date_to) %}
+            AND created_at
+            <=
+            {{ DateTime(date_to, description="Ending date for filtering a date range", required=False) }}
+        {% end %}
+        {% if defined(payment_status) %}
+            AND payment_status = {{ String(payment_status, description="Filter by payment status", required=False) }}
+        {% end %}
+    ORDER BY created_at DESC
+    LIMIT {{ Int32(limit, 100, description="Maximum number of records to return") }}
+
+TYPE endpoint

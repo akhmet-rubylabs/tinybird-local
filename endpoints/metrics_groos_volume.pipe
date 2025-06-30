@@ -1,0 +1,17 @@
+DESCRIPTION >
+    Returns the total gross volume (USD) of settled payments for an organization over the last 7 days.
+
+TOKEN "dashboard" READ
+
+NODE endpoint
+SQL >
+    %
+    SELECT
+        COALESCE(SUM(amount_usd), 0) AS gross_volume
+    FROM payments
+    WHERE
+        payment_status = 'SETTLED'
+        AND organization_id = {{ String(organization_id, description="Organization ID", required=True) }}
+        AND created_at >= now() - INTERVAL 7 DAY
+
+TYPE endpoint

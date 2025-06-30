@@ -1,0 +1,50 @@
+DESCRIPTION >
+    Retrieves webhook events filtered by organization ID
+
+TOKEN "dashboard" READ
+
+NODE endpoint
+SQL >
+    %
+    SELECT
+        webhook_id,
+        event_type,
+        event_trigger,
+        name,
+        status,
+        organization_id,
+        url,
+        bearer_token,
+        payload,
+        payment_id,
+        status_code,
+        created_at
+    FROM webhook_events
+    WHERE
+        organization_id = {{ String(organization_id, description="Organization ID to filter webhook events", required=True) }}
+        {% if defined(payment_id) %}
+            AND payment_id = {{ String(payment_id, description="Payment ID to filter webhook events", required=False) }}
+        {% end %}
+        {% if defined(webhook_id) %}
+            AND webhook_id = {{ String(webhook_id, description="Webhook ID to filter webhook events", required=False) }}
+        {% end %}
+        {% if defined(event_type) %}
+            AND event_type = {{ String(event_type, description="Event type to filter webhook events", required=False) }}
+        {% end %}
+        {% if defined(status) %}
+            AND status = {{ String(status, description="Status to filter webhook events", required=False) }}
+        {% end %}
+        {% if defined(date_from) %}
+            AND created_at
+            >=
+            {{ DateTime(date_from, description="Starting date for filtering a date range", required=False) }}
+        {% end %}
+        {% if defined(date_to) %}
+            AND created_at
+            <=
+            {{ DateTime(date_to, description="Ending date for filtering a date range", required=False) }}
+        {% end %}
+    ORDER BY created_at DESC
+    LIMIT {{ Int32(limit, 100, description="Maximum number of records to return") }}
+
+TYPE endpoint

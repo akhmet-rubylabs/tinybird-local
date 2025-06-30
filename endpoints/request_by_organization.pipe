@@ -27,7 +27,6 @@ SQL >
         r.error_message,
         r.organization_id,
         r.payment_id,
-        r.client_session,
         COALESCE(NULLIF(r.status, ''), p.payment_status, 'DECLINED') AS status
     FROM requests r
     LEFT JOIN payments p ON r.payment_id = p.payment_id and p.payment_operation = r.payment_operation

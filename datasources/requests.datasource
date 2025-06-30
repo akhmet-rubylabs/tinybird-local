@@ -25,7 +25,6 @@ SCHEMA >
     `organization_id` Nullable(String) `json:$.organization_id`,
     `payment_id` Nullable(String) `json:$.payment_id`,
     `payment_operation` Nullable(String) `json:$.payment_operation`,
-    `client_session` Nullable(String) `json:$.client_session`,
     `trigger_date` Nullable(DateTime64(3)) `json:$.trigger_date`
 
 ENGINE MergeTree

@@ -36,3 +36,6 @@ FORWARD_QUERY >
 
 FORWARD_QUERY >
   SELECT id, status, timestamp, direction, event_type, url, request_method, request_headers, request_body, response_headers, response_body, response_status, response_status_description, source, target, processor, title, error_message, organization_id, payment_id, payment_operation, defaultValueOfTypeName('Nullable(String)') AS client_session, trigger_date
+
+FORWARD_QUERY >
+  SELECT id, status, timestamp, direction, event_type, url, request_method, request_headers, request_body, response_headers, response_body, response_status, response_status_description, source, target, processor, title, error_message, organization_id, payment_id, payment_operation, trigger_date
